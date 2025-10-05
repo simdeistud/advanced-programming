@@ -1,0 +1,8 @@
+wget https://raw.githubusercontent.com/logpai/loghub/master/HPC/HPC_2k.log_structured.csv
+
+1. cut --delimiter=',' --fields=3 HPC_2k.log_structured.csv | tail -n +2 | sort | uniq | wc -l
+2. cut --delimiter=',' --fields=3 HPC_2k.log_structured.csv | tail -n +2 | sort | uniq > nodes.log
+3. grep E13 HPC_2k.log_structured.csv | wc -l
+4. grep E3[23] HPC_2k.log_structured.csv | cut --delimiter=',' --fields=3 | sort | uniq | wc -l
+5. grep -E "gige7.+E15" HPC_2k.log_structured.csv | wc -l
+6. grep -E "node-2,+" HPC_2k.log_structured.csv | wc -l

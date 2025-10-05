@@ -1,0 +1,11 @@
+1. cd $HOME
+2. mkdir test1
+3. cd test1, mkdir test2
+4. cd test2, cd ..
+5. touch f1.txt f2.txt f3.dat f4.md README.md .hidden
+6. ls -la
+7. ls *.txt
+8. mv README.md test2
+9. mv *.txt test2
+10. rm f3.dat
+11. cd .., rm -r test1
