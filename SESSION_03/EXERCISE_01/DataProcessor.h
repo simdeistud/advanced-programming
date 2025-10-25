@@ -17,11 +17,13 @@ public:
         {
             data[i] = v[i];
         }
+        instances++;
     }
 
     ~DataProcessor()
     {
         delete[] data;
+        instances--;
     }
 
     DataProcessor(const DataProcessor& other) : DataProcessor(other.data, other.data_size){}
@@ -74,20 +76,64 @@ public:
         return *(new DataProcessor(sum, data_size));
     }
 
+    DataProcessor& operator-(const DataProcessor& d) const
+    {
+        if (data_size != d.data_size)
+        {
+            std::cerr << "Error: Cannot sum DataProcessors: Size mismatch." << std::endl;
+        }
+        auto* sum = new double[data_size];
+        for (int i = 0; i < data_size; i++)
+        {
+            sum[i] = data[i] - d.data[i];
+        }
+        return *(new DataProcessor(sum, data_size));
+    }
+
+    DataProcessor& operator-(const double d) const
+    {
+        auto* sum = new double[data_size];
+        for (int i = 0; i < data_size; i++)
+        {
+            sum[i] = data[i] - d;
+        }
+        return *(new DataProcessor(sum, data_size));
+    }
+
+    DataProcessor& operator*(const DataProcessor& d) const
+    {
+        if (data_size != d.data_size)
+        {
+            std::cerr << "Error: Cannot sum DataProcessors: Size mismatch." << std::endl;
+        }
+        auto* sum = new double[data_size];
+        for (int i = 0; i < data_size; i++)
+        {
+            sum[i] = data[i] * d.data[i];
+        }
+        return *(new DataProcessor(sum, data_size));
+    }
+
     int n_elements() const
     {
         return data_size;
     }
 
+    static int get_instances()
+    {
+        return instances;
+    }
+
     double max() const;
     double min() const;
-    double mean()const ;
+    double mean() const ;
     double stddev() const;
     double sum() const;
 
 private:
     double* data;
     int data_size;
+    inline static int instances = 0;
 };
 
 
