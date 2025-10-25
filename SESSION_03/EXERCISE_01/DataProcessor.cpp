@@ -1,12 +1,7 @@
-//
-// Created by simone on 18/10/25.
-//
-
 #include "DataProcessor.h"
-
 #include <cmath>
 
-double DataProcessor::max()
+double DataProcessor::max() const
 {
     double max = data[0];
     for (int i = 1; i < data_size; i++)
@@ -19,7 +14,7 @@ double DataProcessor::max()
     return max;
 }
 
-double DataProcessor::min()
+double DataProcessor::min() const
 {
     double min = data[0];
     for (int i = 1; i < data_size; i++)
@@ -32,12 +27,12 @@ double DataProcessor::min()
     return min;
 }
 
-double DataProcessor::mean()
+double DataProcessor::mean() const
 {
     return sum() / data_size;
 }
 
-double DataProcessor::stddev()
+double DataProcessor::stddev() const
 {
     double stddev = 0;
     for (int i = 0; i < data_size; i++)
@@ -49,7 +44,7 @@ double DataProcessor::stddev()
     return stddev;
 }
 
-double DataProcessor::sum()
+double DataProcessor::sum() const
 {
     double sum = data[0];
     for (int i = 1; i < data_size; i++)
