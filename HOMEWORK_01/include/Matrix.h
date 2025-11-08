@@ -10,13 +10,11 @@ public:
     SparseMatrix() : colnum(0), rownum(0)
     {
     }
-
     SparseMatrix(const std::vector<double>& values, const std::vector<int>& column_data,
                  const std::vector<int>& row_data) : values(values), column_data(column_data), row_data(row_data),
                                                      colnum(deduce_colnum(column_data))
     {
     }
-
     virtual ~SparseMatrix() = default;
 
     /* We override the operator virtually in the base class
@@ -24,55 +22,36 @@ public:
      */
     virtual double& operator()(const int i, const int j)
     {
-        return get_element(i, j);
-    }
-
-    virtual std::vector<double> operator*(const std::vector<double>& x) final
-    {
-        std::vector<double> y;
-        for (int r = 0; r < rownum; r++)
+        try
         {
-            std::vector<double> row;
-            for (int c = 0; c < colnum; c++)
-            {
-                try
-                {
-                    row.push_back(get_element(r, c));
-                }
-                catch (std::exception e)
-                {
-                    row.push_back(0);
-                }
-            }
-            double sum = 0;
-            for (int k = 0; k < x.size(); k++)
-            {
-                sum += x[k] * row[k];
-            }
-            y.push_back(sum);
+            double& res = get_element(i, j);
+            return res;
+        } catch (std::exception& e)
+        {
+            std::cerr << "Matrix element does not exist" << std::endl;
+            throw;
         }
-        return y;
-    }
 
-    virtual std::size_t get_colnum() const final
+    }
+    virtual std::vector<double> operator*(const std::vector<double>& x) final;
+
+    static SparseMatrix* COOtoCSR(const SparseMatrix& coo);
+    static SparseMatrix* CSRtoCOO(const SparseMatrix& csr);
+
+    virtual int get_colnum() const final
     {
         return colnum;
     }
-
-    virtual std::size_t get_rownum() const final
+    virtual int get_rownum() const final
     {
         return rownum;
     }
-
-    virtual std::size_t get_nonzerosenum() const final
+    virtual int get_nonzerosnum() const final
     {
-        return values.size();
+        return static_cast<int>(values.size());
     }
 
-    virtual void print() const final
-    {
-        ...
-    }
+    virtual void print() const final;
 
 protected:
     /* Since we only implement the COO and CSR formats, both of them deal
@@ -89,14 +68,14 @@ protected:
      * frequent usage. Since the point is to represent big sparse matrices, we
      * use size_t.
      */
-    std::size_t colnum;
-    std::size_t rownum;
+    int colnum;
+    int rownum;
 
-    virtual std::size_t deduce_rownum(const std::vector<int>& row_data) const = 0;
+    virtual int deduce_rownum(const std::vector<int>& row_data) const = 0;
     virtual double& get_element(int i, int j) = 0;
 
 private:
-    std::size_t deduce_colnum(const std::vector<int>& column_data) const
+    int deduce_colnum(const std::vector<int>& column_data) const
     {
         return *std::max_element(column_data.begin(), column_data.end()) + 1;
     }
@@ -108,27 +87,16 @@ public:
     SparseMatrixCOO(const std::vector<double>& values, const std::vector<int>& column_data,
                     const std::vector<int>& row_data) : SparseMatrix(values, column_data, row_data)
     {
-        rownum = deduce_rownum(column_data);
+        rownum = deduce_rownum(row_data);
     }
 
 protected:
-    std::size_t deduce_rownum(const std::vector<int>& row_data) const override
+    int deduce_rownum(const std::vector<int>& row_data) const override
     {
         return *std::max_element(row_data.begin(), row_data.end()) + 1;
     }
 
-    double& get_element(const int i, const int j) override
-    {
-        for (int c = 0; c < values.size(); c++)
-        {
-            if (row_data[c] == i && column_data[c] == j)
-            {
-                return values[c];
-            }
-        }
-        std::cerr << "Matrix element does not exist" << std::endl;
-        throw;
-    }
+    double& get_element(int i, int j) override;
 
 private:
 };
@@ -139,27 +107,16 @@ public:
     SparseMatrixCSR(const std::vector<double>& values, const std::vector<int>& column_data,
                     const std::vector<int>& row_data) : SparseMatrix(values, column_data, row_data)
     {
-        rownum = deduce_rownum(column_data);
+        rownum = deduce_rownum(row_data);
     }
 
 protected:
-    std::size_t deduce_rownum(const std::vector<int>& row_data) const override
+    int deduce_rownum(const std::vector<int>& row_data) const override
     {
-        return row_data.size() - 1;
+        return static_cast<int>(row_data.size() - 1);
     }
 
-    double& get_element(const int i, const int j) override
-    {
-        for (int c = row_data[i]; c < row_data[i + 1]; c++)
-        {
-            if (column_data[c] == j)
-            {
-                return values[c];
-            }
-        }
-        std::cerr << "Matrix element does not exist" << std::endl;
-        throw;
-    }
+    double& get_element(int i, int j) override;
 
 private:
 };
