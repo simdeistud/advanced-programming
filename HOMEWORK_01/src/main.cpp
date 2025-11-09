@@ -104,7 +104,7 @@ void can_print()
     const auto coo_row_data = std::vector{0, 1, 2, 3};
     auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
     coo.print();
-
+    cout << endl;
     const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
     const auto csr_col_data = std::vector{0, 1, 2, 1};
     const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
