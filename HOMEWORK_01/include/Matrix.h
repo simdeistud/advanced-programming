@@ -103,8 +103,11 @@ protected:
     std::vector<int> column_data;
     std::vector<int> row_data;
 
-    // Tries to access element (i, j) of the matrix. If outside of bounds or non-existent, throws.
+    // Tries to retrieve element (i, j) of the matrix. If outside of bounds or non-existent, throws.
     virtual double& get_element(int i, int j) = 0;
+
+    // Tries to retrieve a copy of element (i, j) of the matrix. If outside of bounds or non-existent, throws.
+    virtual double read_element(int i, int j) const = 0;
 
     // Returns the 1-indexed highest column found in the provided data
     static int deduce_maxcolumn(const std::vector<int>& column_data)
@@ -170,6 +173,8 @@ protected:
 
     double& get_element(int i, int j) override;
 
+    double read_element(int i, int j) const override;
+
 private:
     static bool duplicates_exist(const std::vector<int>& column_data,
                                  const std::vector<int>& row_data);
@@ -210,6 +215,8 @@ protected:
     }
 
     double& get_element(int i, int j) override;
+
+    double read_element(int i, int j) const override;
 
 private:
 };

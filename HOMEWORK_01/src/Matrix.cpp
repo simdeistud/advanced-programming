@@ -20,6 +20,7 @@ bool SparseMatrix::is_valid(const std::vector<double>& values,
 
 std::vector<double> SparseMatrix::operator*(const std::vector<double>& x)
 {
+    // We cannot make this operator static
     if (static_cast<int>(x.size()) != get_colnum()) throw std::invalid_argument("Size of x does not match matrix's dimensions");
 
     std::vector<double> y;
@@ -30,7 +31,7 @@ std::vector<double> SparseMatrix::operator*(const std::vector<double>& x)
         {
             try
             {
-                row.push_back(get_element(r, c));
+                row.push_back(read_element(r, c));
             }
             catch (std::exception& e)
             {
@@ -161,6 +162,19 @@ double& SparseMatrixCOO::get_element(const int i, const int j)
     throw std::invalid_argument("Access to unallocated data");
 }
 
+double SparseMatrixCOO::read_element(const int i, const int j) const
+{
+    if (i < 0 || j < 0 || i >= get_rownum() || j >= get_colnum()) throw std::invalid_argument("Index out of bounds");
+    for (int c = 0; c < static_cast<int>(values.size()); c++)
+    {
+        if (row_data[c] == i && column_data[c] == j)
+        {
+            return values[c];
+        }
+    }
+    return 0.0;
+}
+
 bool SparseMatrixCSR::is_valid(const std::vector<double>& values,
                                const std::vector<int>& column_data,
                                const std::vector<int>& row_data,
@@ -194,4 +208,17 @@ double& SparseMatrixCSR::get_element(const int i, const int j)
         }
     }
     throw std::invalid_argument("Access to unallocated data");
+}
+
+double SparseMatrixCSR::read_element(const int i, const int j) const
+{
+    if (i < 0 || j < 0 || i >= get_rownum() || j >= get_colnum()) throw std::invalid_argument("Index out of bounds");
+    for (int c = row_data[i]; c < row_data[i + 1]; c++)
+    {
+        if (column_data[c] == j)
+        {
+            return values[c];
+        }
+    }
+    return 0.0;
 }
