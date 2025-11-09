@@ -2,7 +2,6 @@
 #define ADVANCED_PROGRAMMING_MATRIX_H
 #include <algorithm>
 #include <iostream>
-#include <numeric>
 #include <vector>
 
 class SparseMatrix

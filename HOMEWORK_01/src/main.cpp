@@ -1,4 +1,4 @@
-#include "../include/Matrix.h"
+#include "../include/SparseMatrix.h"
 using namespace std;
 
 bool can_get_colnum()

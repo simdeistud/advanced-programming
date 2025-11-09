@@ -1,8 +1,8 @@
-#include "../include/Matrix.h"
+#include "../include/SparseMatrix.h"
 
 bool SparseMatrix::is_valid(const std::vector<double>& values,
-                         const std::vector<int>& column_data,
-                         const int colnum)
+                            const std::vector<int>& column_data,
+                            const int colnum)
 {
     /* Since COO and CSR share the same format for the values
      * and the column data, in a first approximation we can
