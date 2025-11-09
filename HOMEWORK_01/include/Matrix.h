@@ -74,6 +74,9 @@ public:
                          const std::vector<int>& column_data,
                          const int colnum);
 
+    // Tries to retrieve a copy of element (i, j) of the matrix. If outside of bounds or non-existent, throws.
+    virtual double read_element(int i, int j) const = 0;
+
     // Returns the number of columns of the matrix
     virtual int get_colnum() const final
     {
@@ -157,6 +160,7 @@ public:
                          const std::vector<int>& column_data,
                          const std::vector<int>& row_data,
                          const int colnum, const int rownum);
+    double read_element(int i, int j) const override;
 
 protected:
     // Returns the 1-indexed highest row found in the provided data
@@ -207,6 +211,8 @@ public:
                          const std::vector<int>& column_data,
                          const std::vector<int>& row_data,
                          const int colnum, const int rownum);
+
+    double read_element(int i, int j) const override;
 
 protected:
     // Returns the 1-indexed highest row found in the provided data
