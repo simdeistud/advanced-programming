@@ -1,5 +1,152 @@
 #include "../include/Matrix.h"
 using namespace std;
+
+bool can_get_colnum()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+
+    return coo.get_colnum() == 4 && csr.get_colnum() == 4;
+}
+
+bool can_get_rownum()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+
+    return coo.get_rownum() == 4 && csr.get_rownum() == 4;
+}
+
+bool can_get_nonzerosnum()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+
+    return coo.get_nonzerosnum() == 4 && csr.get_nonzerosnum() == 4;
+}
+
+bool can_read_entry()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+
+    return coo(3, 1) == 6 && csr(3, 1) == 6;
+}
+
+bool can_write_entry()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+    coo(3, 1) = 999;
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+    csr(3, 1) = 999;
+
+    return coo(3, 1) == 999 && csr(3, 1) == 999;
+}
+
+bool can_compute_Mx()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+
+    auto I = std::vector{1.0, 1.0, 1.0, 1.0};
+    auto e3 = std::vector{0.0, 0.0, 1.0, 0.0};
+
+    return coo * I == std::vector{5.0, 8.0, 3.0, 6.0} && coo * e3 == std::vector{0.0, 0.0, 3.0, 0.0} &&
+        csr * I == std::vector{5.0, 8.0, 3.0, 6.0} && csr * e3 == std::vector{0.0, 0.0, 3.0, 0.0};
+}
+
+void can_print()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+    coo.print();
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+    csr.print();
+}
+
+void can_convert_CSR()
+{
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+    cout << "Original CSR: " << endl;
+    csr.print();
+
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+    cout << "COO to CSR: " << endl;
+    SparseMatrix::COOtoCSR(coo)->print();
+
+}
+
+void can_convert_COO()
+{
+    const auto coo_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo_col_data = std::vector{0, 1, 2, 1};
+    const auto coo_row_data = std::vector{0, 1, 2, 3};
+    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data, 4, 4);
+    cout << "Original COO: " << endl;
+    coo.print();
+
+    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr_col_data = std::vector{0, 1, 2, 1};
+    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
+    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data, 4, 4);
+    cout << "CSR to COO: " << endl;
+    SparseMatrix::CSRtoCOO(csr)->print();
+}
+
 int main()
 {
     /*
@@ -9,104 +156,19 @@ int main()
      * | 0 6 0 0 |
      */
 
-    // COO Example
-    const auto coo_values = std::vector<double>{5.0, 8.0, 3.0, 6.0};
-    const auto coo_col_data = std::vector{0, 1, 2, 1};
-    const auto coo_row_data = std::vector{0, 1, 2, 3};
-    auto coo = SparseMatrixCOO(coo_values, coo_col_data, coo_row_data);
-    cout << "Nonzeros = " << coo.get_nonzerosnum() << endl;
-    cout << "Columns = " << coo.get_colnum() << endl;
-    cout << "Rows = " << coo.get_rownum() << endl;
-    coo.print();
-    cout << "Change value to 999:" << endl;
-    coo(2, 2) = 999;
-    coo.print();
+    cout << "Can get number of columns: " << can_get_colnum() << endl;
+    cout << "Can get number of rows: " << can_get_rownum() << endl;
+    cout << "Can get number of nonzeros: " << can_get_nonzerosnum() << endl;
+    cout << "Can read entry: " << can_read_entry() << endl;
+    cout << "Can write entry: " << can_write_entry() << endl;
+    cout << "Can perform product: " << can_compute_Mx() << endl;
+    cout << "Can print: " << endl;
+    can_print();
     cout << endl;
-
-    // CSR Example
-    const auto csr_values = std::vector{5.0, 8.0, 3.0, 6.0};
-    const auto csr_col_data = std::vector{0, 1, 2, 1};
-    const auto csr_row_data = std::vector{0, 1, 2, 3, 4};
-    auto csr = SparseMatrixCSR(csr_values, csr_col_data, csr_row_data);
-    cout << "Nonzeros = " << csr.get_nonzerosnum() << endl;
-    cout << "Columns = " << csr.get_colnum() << endl;
-    cout << "Rows = " << csr.get_rownum() << endl;
-    csr.print();
-    cout << endl;
-    cout << "Change value to 999:" << endl;
-    csr(2, 2) = 999;
-    csr.print();
-    cout << endl;
-
-    cout << "COO to CSR:" << endl;
-    auto* csr_from_coo = dynamic_cast<SparseMatrixCSR*>(SparseMatrix::COOtoCSR(coo));
-    csr_from_coo->print();
-    cout << "Change value to 333:" << endl;
-    (*csr_from_coo)(3, 1) = 333;
-    csr_from_coo->print();
-    cout << endl;
-
-    cout << "CSR to COO:" << endl;
-    auto* coo_from_csr = dynamic_cast<SparseMatrixCOO*>(SparseMatrix::CSRtoCOO(csr));
-    coo_from_csr->print();
-    cout << "Change value to 333:" << endl;
-    (*coo_from_csr)(3, 1) = 333;
-    coo_from_csr->print();
-    cout << endl;
-
-
-    auto x = std::vector{1.0, 1.0, 1.0, 1.0};
-    auto y1 = coo * x;
-    auto y2 = csr * x;
-
-    std::cout << "y1 = coo*1:   [";
-    for (const auto d : y1)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
-    std::cout << "y2 = csr*1:   [";
-    for (const auto d : y2)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
-    cout << endl;
-
-    x = std::vector{1.0, 0.0, 0.0, 0.0};
-    y1 = coo * x;
-    y2 = csr * x;
-
-    std::cout << "r1 = coo*e1:   [";
-    for (const auto d : y1)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
-    std::cout << "r1 = csre1:   [";
-    for (const auto d : y2)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
-    cout << endl;
-
-    // x example
-    x = std::vector{1.0, 2.0, 3.0, 4.0};
-    y1 = coo * x;
-    y2 = csr * x;
-    std::cout << "y1 = coo*x:   [";
-    for (const auto d : y1)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
-    std::cout << "y2 = csr*x:   [";
-    for (const auto d : y2)
-    {
-        cout << d << " ";
-    }
-    std::cout << "]" << std::endl;
+    cout << "Can convert to CSR: " << endl;
+    can_convert_CSR();
+    cout << "Can convert to COO: " << endl;
+    can_convert_COO();
 
     return 0;
 }
