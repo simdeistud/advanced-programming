@@ -54,25 +54,59 @@ int main()
     coo_from_csr->print();
     cout << endl;
 
+
+    auto x = std::vector{1.0, 1.0, 1.0, 1.0};
+    auto y1 = coo * x;
+    auto y2 = csr * x;
+
+    std::cout << "y1 = coo*1:   [";
+    for (const auto d : y1)
+    {
+        cout << d << " ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "y2 = csr*1:   [";
+    for (const auto d : y2)
+    {
+        cout << d << " ";
+    }
+    std::cout << "]" << std::endl;
+    cout << endl;
+
+    x = std::vector{1.0, 0.0, 0.0, 0.0};
+    y1 = coo * x;
+    y2 = csr * x;
+
+    std::cout << "r1 = coo*e1:   [";
+    for (const auto d : y1)
+    {
+        cout << d << " ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "r1 = csre1:   [";
+    for (const auto d : y2)
+    {
+        cout << d << " ";
+    }
+    std::cout << "]" << std::endl;
+    cout << endl;
+
     // x example
-    const auto x = std::vector{1.0, 2.0, 3.0, 4.0};
-    const auto y1 = coo * x;
-    const auto y2 = csr * x;
+    x = std::vector{1.0, 2.0, 3.0, 4.0};
+    y1 = coo * x;
+    y2 = csr * x;
     std::cout << "y1 = coo*x:   [";
     for (const auto d : y1)
     {
         cout << d << " ";
     }
     std::cout << "]" << std::endl;
-    std::cout << "y2 = coo*x:   [";
+    std::cout << "y2 = csr*x:   [";
     for (const auto d : y2)
     {
         cout << d << " ";
     }
     std::cout << "]" << std::endl;
-    //cout << "coo * x = " << y1 << endl;
-    //cout << "csr * x = " << y2 << endl;
-    //cout << "" << << endl;
 
     return 0;
 }
