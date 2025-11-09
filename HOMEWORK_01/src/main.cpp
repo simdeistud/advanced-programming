@@ -147,6 +147,36 @@ void can_convert_COO()
     SparseMatrix::CSRtoCOO(csr)->print();
 }
 
+bool COO_equality_works()
+{
+    const auto coo1_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto coo1_col_data = std::vector{0, 1, 2, 1};
+    const auto coo1_row_data = std::vector{0, 1, 2, 3};
+    const auto coo1 = SparseMatrixCOO(coo1_values, coo1_col_data, coo1_row_data, 4, 4);
+
+    const auto coo2_values = std::vector{3.0, 6.0, 5.0, 8.0};
+    const auto coo2_col_data = std::vector{2, 1, 0, 1};
+    const auto coo2_row_data = std::vector{2, 3, 0, 1};
+    const auto coo2 = SparseMatrixCOO(coo2_values, coo2_col_data, coo2_row_data, 4, 4);
+
+    return coo1 == coo1 && coo2 == coo2 && coo1 == coo2;
+}
+
+bool CSR_equality_works()
+{
+    const auto csr1_values = std::vector{8.0, 5.0, 6.0, 3.0};
+    const auto csr1_col_data = std::vector{1, 0, 3, 2};
+    const auto csr1_row_data = std::vector{0, 2, 2, 4, 4};
+    const auto csr1 = SparseMatrixCSR(csr1_values, csr1_col_data, csr1_row_data, 4, 4);
+
+    const auto csr2_values = std::vector{5.0, 8.0, 3.0, 6.0};
+    const auto csr2_col_data = std::vector{0, 1, 2, 3};
+    const auto csr2_row_data = std::vector{0, 2, 2, 4, 4};
+    const auto csr2 = SparseMatrixCSR(csr2_values, csr2_col_data, csr2_row_data, 4, 4);
+
+    return csr1 == csr1 && csr2 == csr2 && csr1 == csr2;
+}
+
 int main()
 {
     /*
@@ -169,6 +199,8 @@ int main()
     can_convert_CSR();
     cout << "Can convert to COO: " << endl;
     can_convert_COO();
+    cout << "COO equality works: " << COO_equality_works() << endl;
+    cout << "CSR equality works: " << CSR_equality_works() << endl;
 
     return 0;
 }
