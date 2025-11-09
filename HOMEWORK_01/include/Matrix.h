@@ -8,56 +8,89 @@
 class SparseMatrix
 {
 public:
-    SparseMatrix() : SparseMatrix(std::vector<double>(), std::vector<int>(), std::vector<int>())
+    // An empty sparse matrix does not make sense, so we don't implement any default constructor
+
+    SparseMatrix(const std::vector<double>& values,
+                 const std::vector<int>& column_data,
+                 const std::vector<int>& row_data,
+                 const int colnum, const int rownum) : values(values),
+                                                       column_data(column_data), row_data(row_data),
+                                                       colnum(colnum), rownum(rownum)
     {
+        if (!is_valid(values, column_data, colnum)) throw std::invalid_argument("Invalid matrix values");
     }
-    SparseMatrix(const std::vector<double>& values, const std::vector<int>& column_data,
-                 const std::vector<int>& row_data) : values(values), column_data(column_data), row_data(row_data),
-                                                     colnum(deduce_colnum(column_data))
-    {
-        if (!is_valid(values, column_data)) throw std::invalid_argument("Invalid matrix values");
-    }
+
     virtual ~SparseMatrix() = default;
 
-    /* We override the operator virtually in the base class
-     * so all we are left with is to implement get_element
-     */
-    virtual double& operator()(const int i, const int j)
+
+    // Tries to access element (i, j) of the matrix. If outside of bounds or non-existent, throws.
+    virtual double& operator()(const int i, const int j) final
     {
+        /* To avoid having to override the () operator for every subclass,
+         * we override it once in the base class and force every subclass to
+         * implement their own get_element method. We also make it final to
+         * force this exact logic.
+         */
         try
         {
-            double& res = get_element(i, j);
+            auto& res = get_element(i, j);
             return res;
-        } catch (std::exception& e)
+        }
+        catch (std::exception& e)
         {
+            /* The exercise leaves open the possibility of allocating
+             * a new element when A(i, j) = x is performed with an in-bounds
+             * pair of coordinates if an element is not present. This cannot
+             * be done by simply overriding the () operator, since it
+             * doesn't know if it's being called for a simple read or for
+             * a write operation. This would mean that the user could
+             * repeatedly call A(i, j) and allocate zero values across
+             * the sparse matrix, with no way to automatically prune unused
+             * allocations, which is incompatible with the matrix format's purpose.
+             */
             std::cerr << "Matrix element does not exist" << std::endl;
             throw;
         }
-
     }
+
+    // Tries to perform the product y = Mx. Throws if dimensional errors are found.
     virtual std::vector<double> operator*(const std::vector<double>& x) final;
 
+    /*
+     * Since the format conversion has to use directly the internal vectors of the matrix,
+     * they are declared in the base class as static utilities in order to access everything
+     * they need.
+     */
+
+    // Returns a CSR-formatted matrix from a COO one
     static SparseMatrix* COOtoCSR(const SparseMatrix& coo);
+    // Returns a COO-formatted matrix from a CSR one
     static SparseMatrix* CSRtoCOO(const SparseMatrix& csr);
 
-    static bool is_valid(const std::vector<double>& values, const std::vector<int>& column_data)
-    {
-        return values.size() == column_data.size();
-    }
+    // Checks initial validity of the SparseMatrix
+    static bool is_valid(const std::vector<double>& values,
+                         const std::vector<int>& column_data,
+                         const int colnum);
 
+    // Returns the number of columns of the matrix
     virtual int get_colnum() const final
     {
         return colnum;
     }
+
+    // Returns the number of rows of the matrix
     virtual int get_rownum() const final
     {
         return rownum;
     }
+
+    // Returns the number of nonzero elements of the matrix
     virtual int get_nonzerosnum() const final
     {
         return static_cast<int>(values.size());
     }
 
+    // Prints the three vectors defining the matrix one below the other
     virtual void print() const final;
 
 protected:
@@ -69,112 +102,108 @@ protected:
     std::vector<double> values;
     std::vector<int> column_data;
     std::vector<int> row_data;
-    /* Even though the dimensions of the matrix can be inferred at construction
-     * time from the provided vectors, since their update only happens in very
-     * specific conditions, it is useful to have them as accessible fields for
-     * frequent usage. Since the point is to represent big sparse matrices, we
-     * use size_t.
-     */
-    int colnum;
-    int rownum{};
 
-    virtual int deduce_rownum(const std::vector<int>& row_data) const = 0;
+    // Tries to access element (i, j) of the matrix. If outside of bounds or non-existent, throws.
     virtual double& get_element(int i, int j) = 0;
 
-    /* Since the column information in both formats is the same
-     * we can implement this function in the base class
-     */
-    static int deduce_colnum(const std::vector<int>& column_data)
+    // Returns the 1-indexed highest column found in the provided data
+    static int deduce_maxcolumn(const std::vector<int>& column_data)
     {
+        /* Since the column information in both formats is the same
+         * we can implement this function in the base class
+         */
         if (column_data.empty()) return 0;
         return *std::max_element(column_data.begin(), column_data.end()) + 1;
     }
 
-private:
+    // Returns the 1-indexed lowest column found in the provided data
+    static int deduce_mincolumn(const std::vector<int>& column_data)
+    {
+        /* Since the column information in both formats is the same
+         * we can implement this function in the base class
+         */
+        if (column_data.empty()) return 0;
+        return *std::min_element(column_data.begin(), column_data.end()) + 1;
+    }
 
+private:
+    const int colnum;
+    const int rownum;
 };
 
 class SparseMatrixCOO final : public SparseMatrix
 {
 public:
-    SparseMatrixCOO()
+    // Creates a sparse matrix in the COO format.
+    SparseMatrixCOO(const std::vector<double>& values,
+                    const std::vector<int>& column_data,
+                    const std::vector<int>& row_data,
+                    const int colnum, const int rownum): SparseMatrix(values, column_data, row_data, colnum, rownum)
     {
-        row_data = std::vector<int>();
-        rownum = deduce_rownum(row_data);
+        if (!is_valid(values, column_data, row_data, colnum, rownum)) throw std::invalid_argument("Invalid matrix values");
     }
 
-    SparseMatrixCOO(const std::vector<double>& values, const std::vector<int>& column_data,
-                    const std::vector<int>& row_data) : SparseMatrix(values, column_data, row_data)
-    {
-        if (!is_valid(values, column_data, row_data)) throw std::invalid_argument("Invalid matrix values");
-        rownum = deduce_rownum(row_data);
-    }
-
-    static bool is_valid(const std::vector<double>& values, const std::vector<int>& column_data, const std::vector<int>& row_data)
-    {
-        return SparseMatrix::is_valid(values, column_data) && values.size() == row_data.size() && !duplicates_exist(column_data, row_data);
-    }
+    /* A COO matrix is valid iff the following conditions are met:
+     * There are no duplicates;
+     * All the vectors have the same size;
+     * Dimensions are coherent with provided data;
+     */
+    static bool is_valid(const std::vector<double>& values,
+                         const std::vector<int>& column_data,
+                         const std::vector<int>& row_data,
+                         const int colnum, const int rownum);
 
 protected:
-    int deduce_rownum(const std::vector<int>& row_data) const override
+    // Returns the 1-indexed highest row found in the provided data
+    static int deduce_maxrow(const std::vector<int>& row_data)
     {
         if (row_data.empty()) return 0;
         return *std::max_element(row_data.begin(), row_data.end()) + 1;
     }
 
+    // Returns the 1-indexed lowest row found in the provided data
+    static int deduce_minrow(const std::vector<int>& row_data)
+    {
+        if (row_data.empty()) return 0;
+        return *std::min_element(row_data.begin(), row_data.end()) + 1;
+    }
+
     double& get_element(int i, int j) override;
 
 private:
-    static bool duplicates_exist(const std::vector<int>& column_data, const std::vector<int>& row_data)
-    {
-        const int size = static_cast<int>(column_data.size());
-        bool duplicates_exist = false;
-        for (int k = 0; k < size - 1 && !duplicates_exist; k++)
-        {
-            const auto r = row_data.at(k);
-            const auto c = column_data.at(k);
-            for (int i = k+1; i < size; i++)
-            {
-                if (row_data.at(i) == r && column_data.at(i) == c)
-                {
-                    duplicates_exist = true;
-                    break;
-                }
-            }
-        }
-        return duplicates_exist;
-    }
+    static bool duplicates_exist(const std::vector<int>& column_data,
+                                 const std::vector<int>& row_data);
 };
 
 class SparseMatrixCSR final : public SparseMatrix
 {
 public:
-    SparseMatrixCSR(const std::vector<double>& values, const std::vector<int>& column_data,
-                    const std::vector<int>& row_data) : SparseMatrix(values, column_data, row_data)
+    // Creates a sparse matrix in the CSR format.
+    SparseMatrixCSR(const std::vector<double>& values,
+                    const std::vector<int>& column_data,
+                    const std::vector<int>& row_data,
+                    const int colnum, const int rownum): SparseMatrix(values, column_data, row_data, colnum, rownum)
     {
-        if (!is_valid(values, column_data, row_data)) throw std::invalid_argument("Invalid matrix values");
-        rownum = deduce_rownum(row_data);
+        if (!is_valid(values, column_data, row_data, colnum, rownum)) throw std::invalid_argument("Invalid matrix values");
     }
 
-    static bool is_valid(const std::vector<double>& values, const std::vector<int>& column_data, const std::vector<int>& row_data)
-    {
-        const bool starts_with_zero = row_data.at(0) == 0;
-        const bool is_sorted = std::is_sorted(row_data.begin(), row_data.end());
-        bool rows_overflow = false;
-        for (int i = 1; i < static_cast<int>(row_data.size()); i++)
-        {
-            if (row_data.at(i) - row_data.at(i-1) > deduce_colnum(column_data))
-            {
-                rows_overflow = true;
-                break;
-            }
-        }
-        const bool sums_to_numvals = row_data.at(row_data.size() - 1) == values.size();
-        return SparseMatrix::is_valid(values, column_data) && starts_with_zero && is_sorted && !rows_overflow && sums_to_numvals;
-    }
+    /* A CSR matrix is valid iff the following conditions are met:
+     * Dimensions are coherent with provided data;
+     * There are no duplicates (Already guaranteed by CSR format);
+     * The values and the column vectors must have the same size;
+     * The row indexes must start with 0;
+     * The row indexes must be non-decreasing;
+     * The last element of the row indexes must be equal to the numer of nonzero values in the matrix;
+     * The difference between contiguous row indexes must be less than the number of column in the matrix;
+     */
+    static bool is_valid(const std::vector<double>& values,
+                         const std::vector<int>& column_data,
+                         const std::vector<int>& row_data,
+                         const int colnum, const int rownum);
 
 protected:
-    int deduce_rownum(const std::vector<int>& row_data) const override
+    // Returns the 1-indexed highest row found in the provided data
+    static int deduce_maxrow(const std::vector<int>& row_data)
     {
         if (row_data.empty()) return 0;
         return static_cast<int>(row_data.size() - 1);
