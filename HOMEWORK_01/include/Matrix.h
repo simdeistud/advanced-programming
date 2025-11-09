@@ -22,6 +22,8 @@ public:
 
     virtual ~SparseMatrix() = default;
 
+    SparseMatrix& operator=(const SparseMatrix&) = delete;
+
 
     // Tries to access element (i, j) of the matrix. If outside of bounds or non-existent, throws.
     virtual double& operator()(const int i, const int j) final
