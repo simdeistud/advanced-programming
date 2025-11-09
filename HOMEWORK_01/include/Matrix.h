@@ -111,9 +111,6 @@ protected:
     // Tries to retrieve element (i, j) of the matrix. If outside of bounds or non-existent, throws.
     virtual double& get_element(int i, int j) = 0;
 
-    // Tries to retrieve a copy of element (i, j) of the matrix. If outside of bounds or non-existent, throws.
-    virtual double read_element(int i, int j) const = 0;
-
     // Returns the 1-indexed highest column found in the provided data
     static int deduce_maxcolumn(const std::vector<int>& column_data)
     {
@@ -160,7 +157,10 @@ public:
                          const std::vector<int>& column_data,
                          const std::vector<int>& row_data,
                          const int colnum, const int rownum);
+
     double read_element(int i, int j) const override;
+
+    bool operator==(const SparseMatrixCOO& other) const;
 
 protected:
     // Returns the 1-indexed highest row found in the provided data
@@ -179,7 +179,6 @@ protected:
 
     double& get_element(int i, int j) override;
 
-    double read_element(int i, int j) const override;
 
 private:
     static bool duplicates_exist(const std::vector<int>& column_data,
@@ -214,6 +213,8 @@ public:
 
     double read_element(int i, int j) const override;
 
+    bool operator==(const SparseMatrixCSR& other) const;
+
 protected:
     // Returns the 1-indexed highest row found in the provided data
     static int deduce_maxrow(const std::vector<int>& row_data)
@@ -223,8 +224,6 @@ protected:
     }
 
     double& get_element(int i, int j) override;
-
-    double read_element(int i, int j) const override;
 
 private:
 };

@@ -175,6 +175,20 @@ double SparseMatrixCOO::read_element(const int i, const int j) const
     return 0.0;
 }
 
+bool SparseMatrixCOO::operator==(const SparseMatrixCOO& other) const
+{
+    if (this == &other) return true;
+    if (get_nonzerosnum() != other.get_nonzerosnum()) return false;
+    for (int n = 0; n < get_nonzerosnum(); n++)
+    {
+        const auto r = row_data.at(n);
+        const auto c = column_data.at(n);
+        const auto v = values.at(n);
+        if (other.read_element(r, c) != v) return false;
+    }
+    return true;
+}
+
 bool SparseMatrixCSR::is_valid(const std::vector<double>& values,
                                const std::vector<int>& column_data,
                                const std::vector<int>& row_data,
@@ -221,4 +235,30 @@ double SparseMatrixCSR::read_element(const int i, const int j) const
         }
     }
     return 0.0;
+}
+
+bool SparseMatrixCSR::operator==(const SparseMatrixCSR& other) const
+{
+    if (this == &other) return true;
+    if (get_nonzerosnum() != other.get_nonzerosnum()) return false;
+    if (!std::equal(row_data.begin(), row_data.end(), other.row_data.begin())) return false;
+    int acc = 0;
+    for (int i = 1; i < get_rownum() + 1; i++)
+    {
+        for (int j = acc; j < row_data[i]; j++)
+        {
+            const auto c = column_data.at(j);
+            const auto v = values.at(j);
+            for (int k = acc; k <= row_data[i]; k++)
+            {
+                if (k == row_data[i]) return false;
+                if (other.values.at(k) == v && other.column_data.at(k) == c)
+                {
+                    break;
+                }
+            }
+        }
+        acc += row_data[i];
+    }
+    return true;
 }
