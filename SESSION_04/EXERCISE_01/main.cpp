@@ -7,43 +7,49 @@
 
 int main()
 {
-    DataSource* fileTest = new FileDataSource("data.txt");
-    fileTest->read_data();
-    std::cout << "Original data :" << std::endl;
-    fileTest->display_info();
-    delete fileTest;
+    DataSource* ds = nullptr;
+    DataTransformer* dt = nullptr;
+    std::cout << "Do you want to read from a file or from the console? [F/C] : ";
+    std::string in;
+    std::cin >> in;
+    if (in == "F")
+    {
+        ds = new FileDataSource("data.txt");
+    }
+    if (in == "C")
+    {
+        ds = new ConsoleDataSource();
+    }
+    if (ds == nullptr) return 1;
+    ds->read_data();
 
-    //DataSource* consoleTest = new ConsoleDataSource();
-    //consoleTest->display_info();
-    //consoleTest->read_data();
-    //consoleTest->display_info();
+    std::cout << "What transformer do you want to use? [LIN/LOG/STD] : ";
+    std::cin >> in;
+    if (in == "LIN")
+    {
+        std::cout << "With which factor? : ";
+        std::cin >> in;
+        dt = new LinearScaler(ds, strtod(in.c_str(), nullptr));
+    }
+    if (in == "LOG")
+    {
+        dt = new LogTransformer(ds);
+    }
+    if (in == "STD")
+    {
+        dt = new StandardScaler(ds);
+    }
+    if (dt == nullptr) return 1;
 
-    fileTest = new FileDataSource("data.txt");
-    fileTest->read_data();
-    DataTransformer* dataTransformer = new LinearScaler(fileTest, 10.0);
-    dataTransformer->transform();
-    delete dataTransformer;
-    std::cout << "Linear transformer with f=10 :" << std::endl;
-    fileTest->display_info();
-    delete fileTest;
+    std::cout << "Input data : " << std::endl;
+    ds->display_info();
 
-    fileTest = new FileDataSource("data.txt");
-    fileTest->read_data();
-    dataTransformer = new LogTransformer(fileTest);
-    dataTransformer->transform();
-    delete dataTransformer;
-    std::cout << "Log10 transformer :" << std::endl;
-    fileTest->display_info();
-    delete fileTest;
+    std::cout << "Transformed data : " << std::endl;
+    dt->transform();
+    ds->display_info();
 
-    fileTest = new FileDataSource("data.txt");
-    fileTest->read_data();
-    dataTransformer = new StandardScaler(fileTest);
-    dataTransformer->transform();
-    delete dataTransformer;
-    std::cout << "Standard scaling between [0,1] :" << std::endl;
-    fileTest->display_info();
-    delete fileTest;
+    delete ds;
+    delete dt;
 
     return 0;
 }
