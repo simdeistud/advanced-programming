@@ -37,17 +37,28 @@ class FileDataSource final : public DataSource
 public:
     FileDataSource(const std::string& filename) : DataSource(filename, std::vector<double>())
     {
-        file = std::ifstream(filename);
+        file = std::ifstream();
     }
 
     ~FileDataSource() override
     {
-        file.close();
+        if (file.is_open())
+            file.close();
     }
 
     void read_data() override
     {
-
+        file.open(name);
+        if (file.is_open()) {
+            std::string line;
+            while (getline(file, line)) {
+                data.push_back(std::strtod(line.c_str(), nullptr));
+            }
+            file.close();
+        }
+        else {
+            std::cerr << "Unable to open file!" << std::endl;
+        }
     }
 
 private:
@@ -65,7 +76,16 @@ public:
 
     void read_data() override
     {
-
+        std::string line;
+        while (true)
+        {
+            getline(std::cin, line);
+            if (line.empty())
+            {
+               break;
+            }
+            data.push_back(std::strtod(line.c_str(), nullptr));
+        }
     }
 };
 
