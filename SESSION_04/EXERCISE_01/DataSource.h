@@ -23,6 +23,12 @@ public:
 
     void display_info() const
     {
+        std::cout << "[";
+        for (const auto d : data)
+        {
+            std::cout << d << " ";
+        }
+        std::cout << "]" << std::endl;
     }
 
     virtual void read_data() = 0;
