@@ -33,9 +33,9 @@ public:
 
     virtual void read_data() = 0;
 
-protected:
     std::string name;
     std::vector<double> data;
+
 };
 
 class FileDataSource final : public DataSource
