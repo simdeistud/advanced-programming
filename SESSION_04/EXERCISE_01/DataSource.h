@@ -4,58 +4,68 @@
 
 #ifndef ADVANCED_PROGRAMMING_DATASOURCE_H
 #define ADVANCED_PROGRAMMING_DATASOURCE_H
+#include <fstream>
 #include <iostream>
 #include <istream>
 #include <string>
 #include <vector>
 
+
 class DataSource
 {
 public:
-    std::string name;
-    std::vector<double> data;
 
     DataSource(const std::string& name, const std::vector<double>& data) : name(name), data(data)
     {
     }
 
-    virtual ~DataSource()
-    {
-        delete &name;
-        delete &data;
-    }
+    virtual ~DataSource() = default;
 
     void display_info() const
     {
     }
 
     virtual void read_data() = 0;
+
+protected:
+    std::string name;
+    std::vector<double> data;
 };
 
-class FileDataSource : public DataSource
+class FileDataSource final : public DataSource
 {
 public:
-
-    FILE * file;
-
-    FileDataSource(const std::string& filename) : name(filename)
+    FileDataSource(const std::string& filename) : DataSource(filename, std::vector<double>())
     {
-        file = fopen(filename.c_str(), "r");
+        file = std::ifstream(filename);
     }
 
     ~FileDataSource() override
     {
-        fclose(file);
+        file.close();
     }
+
+    void read_data() override
+    {
+
+    }
+
+private:
+    std::ifstream file;
+
 };
 
-class ConsoleDataSource : public DataSource
+class ConsoleDataSource final : public DataSource
 {
 public:
 
-    ConsoleDataSource()
+    ConsoleDataSource() : DataSource("Console", std::vector<double>())
     {
-        name = "Console";
+    }
+
+    void read_data() override
+    {
+
     }
 };
 
