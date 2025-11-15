@@ -23,7 +23,7 @@ public:
 
     void display_info() const
     {
-        std::cout << "[";
+        std::cout << "[ ";
         for (const auto d : data)
         {
             std::cout << d << " ";
