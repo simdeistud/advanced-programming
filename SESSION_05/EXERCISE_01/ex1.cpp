@@ -1,4 +1,5 @@
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -24,9 +25,17 @@ int main() {
 
   std::cout << "List of products:" << std::endl;
   print(products);
+  std::cout << std::endl;
 
   // Compute total cost.
-  // ...
+  const double tot_cost = std::accumulate(products.begin(), products.end(), 0.0, [] (double result, const Product &product)
+  {
+    std::cout << "Partial sum = " << result << std::endl;
+    return result + product.price;
+  });
+  std::cout << std::endl;
+
+  std::cout << "Total cost: " << tot_cost << std::endl;
 
   return 0;
 }
