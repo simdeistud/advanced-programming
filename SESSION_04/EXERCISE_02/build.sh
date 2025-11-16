@@ -1,0 +1,1 @@
+g++ main.cpp -g -O1 -o expression
