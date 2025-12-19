@@ -5,10 +5,12 @@
 #include "StatisticsToolkit.hpp"
 
 int main() {
-    // Test mean function
-    const std::vector<double> v1 = std::vector{1.0, 2.0, 3.0};
-    assert(StatisticsToolkit::mean(v1) == 2.0);
+    const std::vector<double> v1 = std::vector{1.0, 3.0, 2.0};
 
+    // Test mean function
+    assert(StatisticsToolkit::mean(v1) == 2.0);
+    // Test median function
+    assert(StatisticsToolkit::median(v1) == 2.0);
     // Test variance function
     assert(StatisticsToolkit::variance(v1) == 2.0 / 3.0);
     // Test stddev function
