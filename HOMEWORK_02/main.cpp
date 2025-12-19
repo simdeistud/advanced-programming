@@ -6,19 +6,19 @@
 
 int main() {
     // Test mean function
-    const std::vector<double> v = std::vector{1.0, 2.0, 3.0};
-    assert(StatisticsToolkit::mean(v) == 2.0);
+    const std::vector<double> v1 = std::vector{1.0, 2.0, 3.0};
+    assert(StatisticsToolkit::mean(v1) == 2.0);
 
     // Test variance function
-    assert(StatisticsToolkit::variance(v) == 2.0 / 3.0);
+    assert(StatisticsToolkit::variance(v1) == 2.0 / 3.0);
     // Test stddev function
-    assert(StatisticsToolkit::std_dev(v) == std::sqrt(2.0 / 3.0));
+    assert(StatisticsToolkit::std_dev(v1) == std::sqrt(2.0 / 3.0));
 
+    const std::vector<double> v2 = std::vector{1.0, 2.0, 3.0, 1.0};
     // Test count function
-    assert(StatisticsToolkit::count(v, 3.0) == 1);
+    assert(StatisticsToolkit::count(v2, 1.0) == 2);
     // Test frequency table function
-    std::cout << StatisticsToolkit::frequency_map(v)[3.0] << std::endl;
-    assert(StatisticsToolkit::frequency_map(v)[3.0] == 1);
+    assert(StatisticsToolkit::frequency_map(v2)[1.0] == 2);
 
     return 0;
 }
