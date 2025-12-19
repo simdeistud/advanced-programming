@@ -24,3 +24,6 @@ which correspond to basically one type on C++, _double_. For this reason, the va
 types of integration techniques are implemented as static utility methods. Alternatively,
 the user can obtain a _primitive_ std::function from a factory given a starting point
 for integration and n. of subdivisions.
+
+## References used
+- [cppreference.com]()
