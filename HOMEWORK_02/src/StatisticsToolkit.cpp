@@ -33,7 +33,7 @@ std::unordered_map<double, std::size_t> StatisticsToolkit::frequency_map(const s
         if (freq_map.contains(e)) {
             ++freq_map.at(e);
         } else {
-            freq_map.insert({e, 0});
+            freq_map.emplace(e, 1);
         }
     }
     return freq_map;
